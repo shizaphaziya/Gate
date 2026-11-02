@@ -45,3 +45,8 @@ scratch/
 *.bak
 *.swp
 *~
+
+## Pre-built bundles and large binaries
+*.pdb
+[Ss]erver-bundle/
+Gate.Client/server-bundle/
