@@ -1,0 +1,47 @@
+## Build results and artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+dist/
+build/
+TestResults/
+
+## .NET & Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.dbmdl
+.vs/
+_ReSharper*/
+*.resharper
+*.VisualState.xml
+
+## JetBrains (Rider, CLion, IDEA)
+.idea/
+*.iws
+*.iml
+*.ipr
+cmake-build-*/
+
+## Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.directory
+
+## Sensitive data and secrets
+*.pfx
+*.key
+*.pem
+appsettings.Production.json
+appsettings.Local.json
+
+## Scratch and temporary test files
+scratch/
+*.tmp
+*.bak
+*.swp
+*~

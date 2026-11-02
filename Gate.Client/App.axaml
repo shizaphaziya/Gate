@@ -1,0 +1,33 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Gate.Client.App"
+             RequestedThemeVariant="Dark">
+    <Application.Styles>
+        <FluentTheme />
+        <materialIcons:MaterialIconStyles />
+    </Application.Styles>
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="GateBgApp">#121316</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBgHeader">#1B1C22</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBgCard">#1B1C22</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBgCardSecondary">#22242D</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBgInput">#22242D</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBorderBrush">#2B2D3A</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTextPrimary">#F3F4F6</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTextSecondary">#9CA3AF</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTextTertiary">#6B7280</SolidColorBrush>
+        <SolidColorBrush x:Key="GateAccent">#2563EB</SolidColorBrush>
+        <SolidColorBrush x:Key="GateAccentFg">#FFFFFF</SolidColorBrush>
+        <SolidColorBrush x:Key="GateBadgeBg">#262833</SolidColorBrush>
+        <SolidColorBrush x:Key="GateButtonNeutralBg">#374151</SolidColorBrush>
+        <SolidColorBrush x:Key="GateAuditLogBg">#1B1C22</SolidColorBrush>
+        <SolidColorBrush x:Key="GateAuditRowBg">#22242D</SolidColorBrush>
+        <SolidColorBrush x:Key="GateAuditHeaderBg">#121316</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTerminalBg">#0D1117</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTerminalFg">#58A6FF</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTerminalLogsFg">#C9D1D9</SolidColorBrush>
+        <SolidColorBrush x:Key="GateSelectionBg">#1E293B</SolidColorBrush>
+    </Application.Resources>
+</Application>

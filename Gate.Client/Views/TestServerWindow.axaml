@@ -1,0 +1,217 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gate.Client.ViewModels"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="Gate.Client.Views.TestServerWindow"
+        x:DataType="vm:TestServerViewModel"
+        Title="Gate - Тестовый Linux-сервер"
+        Width="760" Height="640"
+        MinWidth="600" MinHeight="480"
+        Background="{DynamicResource GateBgApp}">
+
+    <Panel>
+        <!-- Background Paw Pattern Layer (Visible only in Pink Theme) -->
+        <Canvas IsHitTestVisible="False" IsVisible="{Binding IsPinkTheme}">
+            <materialIcons:MaterialIcon Kind="Paw" Width="55" Height="55"
+                                        Foreground="{DynamicResource GateAccent}" Opacity="0.12"
+                                        Canvas.Left="20" Canvas.Top="70">
+                <materialIcons:MaterialIcon.RenderTransform>
+                    <RotateTransform Angle="-20" />
+                </materialIcons:MaterialIcon.RenderTransform>
+            </materialIcons:MaterialIcon>
+
+            <materialIcons:MaterialIcon Kind="Paw" Width="65" Height="65"
+                                        Foreground="{DynamicResource GateAccent}" Opacity="0.13"
+                                        Canvas.Right="25" Canvas.Bottom="50">
+                <materialIcons:MaterialIcon.RenderTransform>
+                    <RotateTransform Angle="25" />
+                </materialIcons:MaterialIcon.RenderTransform>
+            </materialIcons:MaterialIcon>
+        </Canvas>
+
+        <!-- Main Content Layout -->
+        <Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
+
+            <!-- Row 0: Top Header Bar -->
+            <Border Grid.Row="0" Background="{DynamicResource GateBgHeader}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="0,0,0,1" Padding="16,12">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource GateAccent}" CornerRadius="6" Width="34" Height="34">
+                            <materialIcons:MaterialIcon Kind="Linux" Width="20" Height="20"
+                                                        Foreground="{DynamicResource GateAccentFg}"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="ТЕСТОВЫЙ LINUX-СЕРВЕР" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource GateTextPrimary}" />
+                            <TextBlock Text="Контейнер gate-test-linux (Ubuntu 24.04 LTS, systemd PID 1)" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Status Badge -->
+                    <Border Grid.Column="2" Background="{Binding StatusColor}" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <materialIcons:MaterialIcon Kind="CheckCircle" Width="14" Height="14" Foreground="White" IsVisible="{Binding IsRunning}" />
+                            <materialIcons:MaterialIcon Kind="StopCircle" Width="14" Height="14" Foreground="White" IsVisible="{Binding !IsRunning}" />
+                            <TextBlock Text="{Binding StatusText}" FontWeight="Bold" FontSize="11" Foreground="White" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Row 1: Connection Parameters Badges -->
+            <Border Grid.Row="1" Background="{DynamicResource GateBgCard}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="0,0,0,1" Padding="16,10">
+                <Grid ColumnDefinitions="*, *, *, *">
+                    <Border Grid.Column="0" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Gate Порт (Вход):" FontSize="10" Foreground="{DynamicResource GateAccent}" FontWeight="Bold" />
+                            <TextBlock Text="127.0.0.1:5050" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="SSH Порт (Установка):" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="127.0.0.1:2222" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="SSH Доступ:" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="root / root" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Инициализация:" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="systemd (PID 1)" FontSize="12" Foreground="{DynamicResource GateAccent}" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Row 2: Action Buttons Bar -->
+            <Border Grid.Row="2" Background="{DynamicResource GateBgHeader}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="0,0,0,1" Padding="16,10">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto, Auto">
+                        <!-- Start Button -->
+                        <Button Grid.Column="0"
+                                Command="{Binding StartServerCommand}"
+                                IsEnabled="{Binding !IsRunning}"
+                                Background="#059669" Foreground="White"
+                                Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="PlayArrow" Width="14" Height="14" />
+                                <TextBlock Text="Запустить сервер" FontWeight="Bold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Stop Button -->
+                        <Button Grid.Column="1"
+                                Command="{Binding StopServerCommand}"
+                                IsEnabled="{Binding IsRunning}"
+                                Background="#DC2626" Foreground="White"
+                                Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="StopCircle" Width="14" Height="14" />
+                                <TextBlock Text="Остановить" FontWeight="Bold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Restart Button -->
+                        <Button Grid.Column="2"
+                                Command="{Binding RestartServerCommand}"
+                                IsEnabled="{Binding IsRunning}"
+                                Background="#D97706" Foreground="White"
+                                Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="Restart" Width="14" Height="14" />
+                                <TextBlock Text="Перезапуск" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Journal Logs Button -->
+                        <Button Grid.Column="3"
+                                Command="{Binding FetchJournalLogsCommand}"
+                                IsEnabled="{Binding IsRunning}"
+                                Background="{DynamicResource GateAccent}" Foreground="{DynamicResource GateAccentFg}"
+                                Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="FileDocumentOutline" Width="14" Height="14" />
+                                <TextBlock Text="Логи systemd" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Reset Server Button -->
+                        <Button Grid.Column="4"
+                                Command="{Binding ResetServerCommand}"
+                                IsEnabled="{Binding !IsBusy}"
+                                Background="#991B1B" Foreground="White"
+                                Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="Restore" Width="14" Height="14" />
+                                <TextBlock Text="Сбросить сервер" FontWeight="Bold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Rebuild Button -->
+                        <Button Grid.Column="6"
+                                Command="{Binding RebuildServerCommand}"
+                                IsEnabled="{Binding !IsBusy}"
+                                Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}"
+                                Padding="10,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="HammerWrench" Width="13" Height="13" />
+                                <TextBlock Text="Пересобрать" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Clear Log Button -->
+                        <Button Grid.Column="7"
+                                Command="{Binding ClearLogCommand}"
+                                Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}"
+                                Padding="10,7" CornerRadius="6" FontSize="11">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="13" Height="13" />
+                                <TextBlock Text="Очистить" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <ProgressBar IsIndeterminate="{Binding IsBusy}"
+                                 IsVisible="{Binding IsBusy}"
+                                 Height="3" CornerRadius="1.5" />
+                </StackPanel>
+            </Border>
+
+            <!-- Row 3: Output Terminal -->
+            <Border Grid.Row="3" Background="{DynamicResource GateTerminalBg}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="1"
+                    CornerRadius="8" Padding="12" Margin="14,10,14,10">
+                <Grid RowDefinitions="Auto, *">
+                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,6">
+                        <TextBlock Grid.Column="0" Text="ЖУРНАЛ УПРАВЛЕНИЯ ТЕСТОВЫМ СЕРВЕРОМ" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GateTextSecondary}" />
+                        <TextBlock Grid.Column="1" Text="gate-test-linux:2222" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1">
+                        <SelectableTextBlock Text="{Binding ConsoleLog}"
+                                             FontFamily="Consolas, Cascadia Code, Courier New, Monospace"
+                                             FontSize="11" Foreground="{DynamicResource GateTerminalLogsFg}" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Row 4: Bottom Status Bar -->
+            <Border Grid.Row="4" Background="{DynamicResource GateBgHeader}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="0,1,0,0" Padding="16,8">
+                <Grid ColumnDefinitions="Auto, *">
+                    <TextBlock Grid.Column="0" Text="Инфо:" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" FontWeight="Bold" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding StatusDetails}"
+                               FontSize="11" Foreground="{DynamicResource GateTextPrimary}"
+                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Panel>
+</Window>
