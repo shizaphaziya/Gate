@@ -78,20 +78,20 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsDeployMode => ConnectionMode == 1;
 
     public string LoginTabButtonBg => IsLoginMode
-        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#FF4081" : "#2563EB")
+        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#C2185B" : "#2563EB")
         : "Transparent";
 
     public string LoginTabButtonFg => IsLoginMode
         ? "#FFFFFF"
-        : (ThemeService.CurrentTheme == AppTheme.Pink ? "#88304E" : "#9CA3AF");
+        : (ThemeService.CurrentTheme == AppTheme.Pink ? "#88304E" : StatusPalette.Muted);
 
     public string DeployTabButtonBg => IsDeployMode
-        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#FF4081" : "#2563EB")
+        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#C2185B" : "#2563EB")
         : "Transparent";
 
     public string DeployTabButtonFg => IsDeployMode
         ? "#FFFFFF"
-        : (ThemeService.CurrentTheme == AppTheme.Pink ? "#88304E" : "#9CA3AF");
+        : (ThemeService.CurrentTheme == AppTheme.Pink ? "#88304E" : StatusPalette.Muted);
 
     [RelayCommand]
     public void SetConnectionMode(object? parameter)
@@ -115,7 +115,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private int _selectedTabIndex = 0;
 
-    // Login tab properties
     [ObservableProperty]
     private string _serverHost = "127.0.0.1";
 
@@ -137,7 +136,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _loginErrorMessage = string.Empty;
 
-    // SSH Deploy tab properties
     [ObservableProperty]
     private string _sshHost = "127.0.0.1";
 
@@ -157,7 +155,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _serverBinaryStatusText = "Проверка дистрибутива...";
 
     [ObservableProperty]
-    private string _serverBinaryStatusColor = "#10B981";
+    private string _serverBinaryStatusColor = StatusPalette.Ok;
 
     [ObservableProperty]
     private Material.Icons.MaterialIconKind _serverBinaryStatusIcon = Material.Icons.MaterialIconKind.CheckCircle;
@@ -174,14 +172,14 @@ public partial class MainWindowViewModel : ViewModelBase
             if (string.IsNullOrWhiteSpace(LocalServerBinaryPath))
             {
                 ServerBinaryStatusText = $"Встроенный пакет готов: {info.Name} ({info.Length / (1024 * 1024)} МБ)";
-                ServerBinaryStatusColor = "#10B981";
+                ServerBinaryStatusColor = StatusPalette.Ok;
                 ServerBinaryStatusIcon = Material.Icons.MaterialIconKind.CheckCircle;
                 IsCustomBinarySpecified = false;
             }
             else
             {
                 ServerBinaryStatusText = $"Пользовательский файл: {info.Name} ({info.Length / (1024 * 1024)} МБ)";
-                ServerBinaryStatusColor = "#3B82F6";
+                ServerBinaryStatusColor = StatusPalette.Info;
                 ServerBinaryStatusIcon = Material.Icons.MaterialIconKind.FolderCheck;
                 IsCustomBinarySpecified = true;
             }
@@ -189,7 +187,7 @@ public partial class MainWindowViewModel : ViewModelBase
         else
         {
             ServerBinaryStatusText = "Пакет не найден (будет собран автоматически перед деплоем)";
-            ServerBinaryStatusColor = "#F59E0B";
+            ServerBinaryStatusColor = StatusPalette.Warn;
             ServerBinaryStatusIcon = Material.Icons.MaterialIconKind.Autorenew;
             IsCustomBinarySpecified = false;
         }
@@ -199,7 +197,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task RebuildServerBinaryAsync()
     {
         ServerBinaryStatusText = "Сборка пакета через dotnet publish...";
-        ServerBinaryStatusColor = "#3B82F6";
+        ServerBinaryStatusColor = StatusPalette.Info;
         ServerBinaryStatusIcon = Material.Icons.MaterialIconKind.Autorenew;
 
         var (success, path, log) = await ServerPackageResolver.AutoBuildServerBinaryAsync();
@@ -212,7 +210,7 @@ public partial class MainWindowViewModel : ViewModelBase
         else
         {
             ServerBinaryStatusText = "Ошибка сборки пакета";
-            ServerBinaryStatusColor = "#EF4444";
+            ServerBinaryStatusColor = StatusPalette.Error;
             ServerBinaryStatusIcon = Material.Icons.MaterialIconKind.CloseCircle;
             DeployProgressLog += $"[{DateTime.Now:HH:mm:ss}] Ошибка сборки: {log}\n";
         }
@@ -235,7 +233,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _checkRepairStatusMessage = string.Empty;
 
     [ObservableProperty]
-    private string _checkRepairStatusColor = "#10B981";
+    private string _checkRepairStatusColor = StatusPalette.Ok;
 
     [ObservableProperty]
     private bool _canSwitchToLoginAfterCheck = false;
@@ -243,7 +241,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _deployProgressLog = "Ready for SSH deployment.\n";
 
-    // Gate Management tab properties
     [ObservableProperty]
     private ObservableCollection<ServiceItemViewModel> _services = new();
 
@@ -266,7 +263,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _statusNotification = "Готов к работе.";
 
     [ObservableProperty]
-    private string _statusNotificationColor = "#9CA3AF";
+    private string _statusNotificationColor = StatusPalette.Muted;
 
     [ObservableProperty]
     private bool _isAutoRefreshEnabled = false;
@@ -318,7 +315,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    // Quick presets
     [RelayCommand]
     private void FillAdmin()
     {
@@ -368,7 +364,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SshPort = 2222;
         SshUser = "root";
         SshPassword = "root";
-        SetStatus("Параметры локального тестового Linux (127.0.0.1:2222, root/root) установлены", "#3B82F6");
+        SetStatus("Параметры локального тестового Linux (127.0.0.1:2222, root/root) установлены", StatusPalette.Info);
     }
 
     [RelayCommand]
@@ -381,7 +377,7 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 LocalServerBinaryPath = selected;
                 RefreshServerBinaryStatus();
-                SetStatus($"Выбран бинарник: {selected}", "#10B981");
+                SetStatus($"Выбран бинарник: {selected}", StatusPalette.Ok);
             }
         }
     }
@@ -398,8 +394,8 @@ public partial class MainWindowViewModel : ViewModelBase
             if (response.Success)
             {
                 IsLoggedIn = true;
-                CurrentUserDisplay = $"Пользователь: {Username} | Роль: {response.Role}";
-                SetStatus($"Успешный вход в систему с ролью {response.Role}", "#10B981");
+                CurrentUserDisplay = $"{Username} ({response.Role})";
+                SetStatus($"Успешный вход в систему с ролью {response.Role}", StatusPalette.Ok);
 
                 await RefreshServicesAsync();
                 await RefreshAuditAsync();
@@ -410,19 +406,18 @@ public partial class MainWindowViewModel : ViewModelBase
                     SelectedService = Services.FirstOrDefault(s => s.Name == "dummy-worker.service") ?? Services[0];
                 }
 
-                // Switch to management tab
                 SelectedTabIndex = 2;
             }
             else
             {
                 LoginErrorMessage = response.ErrorMessage ?? "Ошибка аутентификации.";
-                SetStatus(LoginErrorMessage, "#EF4444");
+                SetStatus(LoginErrorMessage, StatusPalette.Error);
             }
         }
         catch (Exception ex)
         {
             LoginErrorMessage = $"Ошибка подключения: {ex.Message}";
-            SetStatus(LoginErrorMessage, "#EF4444");
+            SetStatus(LoginErrorMessage, StatusPalette.Error);
         }
         finally
         {
@@ -440,7 +435,7 @@ public partial class MainWindowViewModel : ViewModelBase
         AuditLogs.Clear();
         SelectedService = null;
         TerminalLogs = "Сессия завершена.\n";
-        SetStatus("Соединение разорвано.", "#9CA3AF");
+        SetStatus("Соединение разорвано.", StatusPalette.Muted);
         SelectedTabIndex = 0;
     }
 
@@ -471,13 +466,13 @@ public partial class MainWindowViewModel : ViewModelBase
             ServerPort = 5050;
             CanSwitchToLoginAfterCheck = true;
             CheckRepairStatusMessage = "Gate успешно установлен и запущен на порту 5050!";
-            CheckRepairStatusColor = "#10B981";
-            SetStatus("Развертывание сервера по SSH успешно завершено", "#10B981");
+            CheckRepairStatusColor = StatusPalette.Ok;
+            SetStatus("Развертывание сервера по SSH успешно завершено", StatusPalette.Ok);
         }
         catch (Exception ex)
         {
             DeployProgressLog += $"[{DateTime.Now:HH:mm:ss}] ОШИБКА РАЗВЕРТЫВАНИЯ: {ex.Message}\n";
-            SetStatus($"Ошибка SSH-установки: {ex.Message}", "#EF4444");
+            SetStatus($"Ошибка SSH-установки: {ex.Message}", StatusPalette.Error);
         }
         finally
         {
@@ -492,7 +487,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         IsCheckingServer = true;
         CheckRepairStatusMessage = "Подключение и проверка состояния Gate...";
-        CheckRepairStatusColor = "#3B82F6";
+        CheckRepairStatusColor = StatusPalette.Info;
         CanSwitchToLoginAfterCheck = false;
         DeployProgressLog += $"--- [{DateTime.Now:HH:mm:ss}] Проверка и диагностика Gate на {SshHost}:{SshPort} ---\n";
 
@@ -512,29 +507,29 @@ public partial class MainWindowViewModel : ViewModelBase
             CheckRepairStatusMessage = res.Message;
             if (res.IsRunning)
             {
-                CheckRepairStatusColor = "#10B981";
+                CheckRepairStatusColor = StatusPalette.Ok;
                 CanSwitchToLoginAfterCheck = true;
                 ServerHost = SshHost;
                 ServerPort = 5050;
-                SetStatus($"Gate готов к работе на порту 5050", "#10B981");
+                SetStatus($"Gate готов к работе на порту 5050", StatusPalette.Ok);
             }
             else if (!res.IsInstalled)
             {
-                CheckRepairStatusColor = "#F59E0B";
-                SetStatus("Gate не установлен на сервере", "#F59E0B");
+                CheckRepairStatusColor = StatusPalette.Warn;
+                SetStatus("Gate не установлен на сервере", StatusPalette.Warn);
             }
             else
             {
-                CheckRepairStatusColor = "#EF4444";
-                SetStatus("Ошибка запуска Gate после починки", "#EF4444");
+                CheckRepairStatusColor = StatusPalette.Error;
+                SetStatus("Ошибка запуска Gate после починки", StatusPalette.Error);
             }
         }
         catch (Exception ex)
         {
             CheckRepairStatusMessage = $"Ошибка подключения: {ex.Message}";
-            CheckRepairStatusColor = "#EF4444";
+            CheckRepairStatusColor = StatusPalette.Error;
             DeployProgressLog += $"[{DateTime.Now:HH:mm:ss}] ОШИБКА ДИАГНОСТИКИ: {ex.Message}\n";
-            SetStatus($"Ошибка SSH: {ex.Message}", "#EF4444");
+            SetStatus($"Ошибка SSH: {ex.Message}", StatusPalette.Error);
         }
         finally
         {
@@ -564,14 +559,14 @@ public partial class MainWindowViewModel : ViewModelBase
             );
 
             CheckRepairStatusMessage = "Сервер сброшен до исходного состояния без Gate.";
-            CheckRepairStatusColor = "#9CA3AF";
+            CheckRepairStatusColor = StatusPalette.Muted;
             CanSwitchToLoginAfterCheck = false;
-            SetStatus("Удаленный сервер успешно сброшен", "#10B981");
+            SetStatus("Удаленный сервер успешно сброшен", StatusPalette.Ok);
         }
         catch (Exception ex)
         {
             DeployProgressLog += $"[{DateTime.Now:HH:mm:ss}] ОШИБКА СБРОСА: {ex.Message}\n";
-            SetStatus($"Ошибка сброса: {ex.Message}", "#EF4444");
+            SetStatus($"Ошибка сброса: {ex.Message}", StatusPalette.Error);
         }
         finally
         {
@@ -614,7 +609,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (!silent)
             {
-                SetStatus($"Ошибка обновления служб: {ex.Message}", "#EF4444");
+                SetStatus($"Ошибка обновления служб: {ex.Message}", StatusPalette.Error);
             }
         }
     }
@@ -639,7 +634,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (!silent)
             {
-                SetStatus($"Ошибка загрузки аудита: {ex.Message}", "#EF4444");
+                SetStatus($"Ошибка загрузки аудита: {ex.Message}", StatusPalette.Error);
             }
         }
     }
@@ -674,7 +669,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(serviceName))
         {
-            SetStatus("Служба не выбрана для выполнения действия", "#EF4444");
+            SetStatus("Служба не выбрана для выполнения действия", StatusPalette.Error);
             return;
         }
 
@@ -683,11 +678,11 @@ public partial class MainWindowViewModel : ViewModelBase
             var result = await _networkClient.ExecuteActionAsync(serviceName, action);
             if (result.Success)
             {
-                SetStatus($"[200 OK] {result.Message}", "#10B981");
+                SetStatus($"[200 OK] {result.Message}", StatusPalette.Ok);
             }
             else
             {
-                SetStatus($"[{result.Message}]", "#EF4444");
+                SetStatus($"[{result.Message}]", StatusPalette.Error);
             }
 
             await RefreshServicesInternalAsync(silent: true);
@@ -696,7 +691,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            SetStatus($"Исключение при выполнении действия: {ex.Message}", "#EF4444");
+            SetStatus($"Исключение при выполнении действия: {ex.Message}", StatusPalette.Error);
         }
     }
 
@@ -718,7 +713,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(serviceName))
         {
-            if (!silent) SetStatus("Выберите службу для загрузки логов", "#EF4444");
+            if (!silent) SetStatus("Выберите службу для загрузки логов", StatusPalette.Error);
             return;
         }
 
@@ -740,11 +735,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
             if (logs.StartsWith("403 FORBIDDEN"))
             {
-                SetStatus(logs, "#EF4444");
+                SetStatus(logs, StatusPalette.Error);
             }
             else if (!silent)
             {
-                SetStatus($"Логи службы {serviceName} успешно обновлены", "#10B981");
+                SetStatus($"Логи службы {serviceName} успешно обновлены", StatusPalette.Ok);
             }
 
             await RefreshAuditInternalAsync(silent: true);
@@ -752,7 +747,7 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             TerminalLogs = $"Ошибка при загрузке логов: {ex.Message}";
-            if (!silent) SetStatus($"Ошибка чтения логов: {ex.Message}", "#EF4444");
+            if (!silent) SetStatus($"Ошибка чтения логов: {ex.Message}", StatusPalette.Error);
         }
     }
 
@@ -761,14 +756,14 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(TerminalLogs))
         {
-            SetStatus("Логи пусты для копирования", "#9CA3AF");
+            SetStatus("Логи пусты для копирования", StatusPalette.Muted);
             return;
         }
 
         if (CopyToClipboardHandler != null)
         {
             await CopyToClipboardHandler.Invoke(TerminalLogs);
-            SetStatus("Логи успешно скопированы в буфер обмена", "#10B981");
+            SetStatus("Логи успешно скопированы в буфер обмена", StatusPalette.Ok);
         }
     }
 
@@ -776,7 +771,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ClearTerminal()
     {
         TerminalLogs = string.Empty;
-        SetStatus("Окно логов очищено", "#9CA3AF");
+        SetStatus("Окно логов очищено", StatusPalette.Muted);
     }
 
     private void SetStatus(string message, string hexColor)

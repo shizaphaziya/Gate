@@ -10,25 +10,6 @@
         Background="{DynamicResource GateBgApp}">
 
     <Panel>
-        <!-- Background Paw Pattern Layer (Visible only in Pink Theme) -->
-        <Canvas IsHitTestVisible="False" IsVisible="{Binding IsPinkTheme}">
-            <materialIcons:MaterialIcon Kind="Paw" Width="55" Height="55"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.12"
-                                        Canvas.Left="20" Canvas.Top="70">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="-20" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-
-            <materialIcons:MaterialIcon Kind="Paw" Width="65" Height="65"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.13"
-                                        Canvas.Right="25" Canvas.Bottom="50">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="25" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-        </Canvas>
-
         <!-- Main Content Layout -->
         <Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
 
@@ -42,7 +23,7 @@
                                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="ТЕСТОВЫЙ LINUX-СЕРВЕР" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource GateTextPrimary}" />
+                            <TextBlock Text="Тестовый Linux-сервер" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource GateTextPrimary}" />
                             <TextBlock Text="Контейнер gate-test-linux (Ubuntu 24.04 LTS, systemd PID 1)" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
                         </StackPanel>
                     </StackPanel>
@@ -63,29 +44,29 @@
                 <Grid ColumnDefinitions="*, *, *, *">
                     <Border Grid.Column="0" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="Gate Порт (Вход):" FontSize="10" Foreground="{DynamicResource GateAccent}" FontWeight="Bold" />
+                            <TextBlock Text="Gate Порт (Вход):" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" FontWeight="Bold" />
                             <TextBlock Text="127.0.0.1:5050" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="1" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="SSH Порт (Установка):" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="SSH Порт (Установка):" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
                             <TextBlock Text="127.0.0.1:2222" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="2" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="SSH Доступ:" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="SSH Доступ:" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
                             <TextBlock Text="root / root" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="3" Background="{DynamicResource GateBgCardSecondary}" CornerRadius="6" Padding="10,6">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="Инициализация:" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
-                            <TextBlock Text="systemd (PID 1)" FontSize="12" Foreground="{DynamicResource GateAccent}" FontWeight="Bold" />
+                            <TextBlock Text="Инициализация:" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" FontWeight="SemiBold" />
+                            <TextBlock Text="systemd (PID 1)" FontSize="12" Foreground="{DynamicResource GateTextPrimary}" FontWeight="Bold" />
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -99,7 +80,7 @@
                         <Button Grid.Column="0"
                                 Command="{Binding StartServerCommand}"
                                 IsEnabled="{Binding !IsRunning}"
-                                Background="#059669" Foreground="White"
+                                Background="{DynamicResource GateSuccess}" Foreground="White"
                                 Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <materialIcons:MaterialIcon Kind="PlayArrow" Width="14" Height="14" />
@@ -111,7 +92,7 @@
                         <Button Grid.Column="1"
                                 Command="{Binding StopServerCommand}"
                                 IsEnabled="{Binding IsRunning}"
-                                Background="#DC2626" Foreground="White"
+                                Background="{DynamicResource GateDanger}" Foreground="White"
                                 Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <materialIcons:MaterialIcon Kind="StopCircle" Width="14" Height="14" />
@@ -123,7 +104,7 @@
                         <Button Grid.Column="2"
                                 Command="{Binding RestartServerCommand}"
                                 IsEnabled="{Binding IsRunning}"
-                                Background="#D97706" Foreground="White"
+                                Background="{DynamicResource GateWarning}" Foreground="White"
                                 Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <materialIcons:MaterialIcon Kind="Restart" Width="14" Height="14" />
@@ -147,7 +128,7 @@
                         <Button Grid.Column="4"
                                 Command="{Binding ResetServerCommand}"
                                 IsEnabled="{Binding !IsBusy}"
-                                Background="#991B1B" Foreground="White"
+                                Background="{DynamicResource GateDanger}" Foreground="White"
                                 Padding="12,7" CornerRadius="6" FontSize="11" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <materialIcons:MaterialIcon Kind="Restore" Width="14" Height="14" />
@@ -190,7 +171,7 @@
                     CornerRadius="8" Padding="12" Margin="14,10,14,10">
                 <Grid RowDefinitions="Auto, *">
                     <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,6">
-                        <TextBlock Grid.Column="0" Text="ЖУРНАЛ УПРАВЛЕНИЯ ТЕСТОВЫМ СЕРВЕРОМ" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GateTextSecondary}" />
+                        <TextBlock Grid.Column="0" Text="Журнал управления тестовым сервером" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GateTextSecondary}" />
                         <TextBlock Grid.Column="1" Text="gate-test-linux:2222" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
                     </Grid>
 

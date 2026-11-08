@@ -45,7 +45,7 @@ public class TestServerManager
             var (code, stdout, _) = await RunProcessAsync("docker", "inspect --format \"{{.State.Status}}|{{.State.Running}}|{{.Created}}|{{.State.StartedAt}}\" gate-test-linux");
             if (code != 0 || string.IsNullOrWhiteSpace(stdout))
             {
-                return new ContainerStatusInfo(false, "Не создан", "#6B7280", "Контейнер gate-test-linux не найден в системе.");
+                return new ContainerStatusInfo(false, "Не создан", "#4B5563", "Контейнер gate-test-linux не найден в системе.");
             }
 
             var parts = stdout.Trim().Trim('"').Split('|');
@@ -55,14 +55,14 @@ public class TestServerManager
             if (running)
             {
                 var startedAt = parts.Length > 3 ? parts[3] : "";
-                return new ContainerStatusInfo(true, "Работает (Online)", "#10B981", $"Запущен в {startedAt}. Порты: 2222->22, 5050->5050");
+                return new ContainerStatusInfo(true, "Работает (Online)", "#047857", $"Запущен в {startedAt}. Порты: 2222->22, 5050->5050");
             }
 
-            return new ContainerStatusInfo(false, $"Остановлен ({status})", "#EF4444", "Контейнер существует, но не запущен.");
+            return new ContainerStatusInfo(false, $"Остановлен ({status})", "#B91C1C", "Контейнер существует, но не запущен.");
         }
         catch (Exception ex)
         {
-            return new ContainerStatusInfo(false, "Ошибка опроса", "#EF4444", ex.Message);
+            return new ContainerStatusInfo(false, "Ошибка опроса", "#B91C1C", ex.Message);
         }
     }
 

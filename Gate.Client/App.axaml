@@ -6,9 +6,28 @@
     <Application.Styles>
         <FluentTheme />
         <materialIcons:MaterialIconStyles />
+
+        <Style Selector="Button, ComboBox, CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button:disabled, ComboBox:disabled, CheckBox:disabled">
+            <Setter Property="Cursor" Value="No" />
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Opacity" Value="0.8" />
+        </Style>
+        <Style Selector="Button:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource GateTextPrimary}" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style Selector="materialIcons|MaterialIcon">
+            <Setter Property="(AutomationProperties.AccessibilityView)" Value="Raw" />
+        </Style>
     </Application.Styles>
 
     <Application.Resources>
+        <!-- Inter ships with the app: full Cyrillic coverage and legible at the 11px used in dense tables. -->
         <SolidColorBrush x:Key="GateBgApp">#121316</SolidColorBrush>
         <SolidColorBrush x:Key="GateBgHeader">#1B1C22</SolidColorBrush>
         <SolidColorBrush x:Key="GateBgCard">#1B1C22</SolidColorBrush>
@@ -17,7 +36,7 @@
         <SolidColorBrush x:Key="GateBorderBrush">#2B2D3A</SolidColorBrush>
         <SolidColorBrush x:Key="GateTextPrimary">#F3F4F6</SolidColorBrush>
         <SolidColorBrush x:Key="GateTextSecondary">#9CA3AF</SolidColorBrush>
-        <SolidColorBrush x:Key="GateTextTertiary">#6B7280</SolidColorBrush>
+        <SolidColorBrush x:Key="GateTextTertiary">#8B93A1</SolidColorBrush>
         <SolidColorBrush x:Key="GateAccent">#2563EB</SolidColorBrush>
         <SolidColorBrush x:Key="GateAccentFg">#FFFFFF</SolidColorBrush>
         <SolidColorBrush x:Key="GateBadgeBg">#262833</SolidColorBrush>
@@ -29,5 +48,9 @@
         <SolidColorBrush x:Key="GateTerminalFg">#58A6FF</SolidColorBrush>
         <SolidColorBrush x:Key="GateTerminalLogsFg">#C9D1D9</SolidColorBrush>
         <SolidColorBrush x:Key="GateSelectionBg">#1E293B</SolidColorBrush>
+        <SolidColorBrush x:Key="GateSuccess">#047857</SolidColorBrush>
+        <SolidColorBrush x:Key="GateDanger">#B91C1C</SolidColorBrush>
+        <SolidColorBrush x:Key="GateWarning">#B45309</SolidColorBrush>
+        <SolidColorBrush x:Key="GateDangerText">#F87171</SolidColorBrush>
     </Application.Resources>
 </Application>

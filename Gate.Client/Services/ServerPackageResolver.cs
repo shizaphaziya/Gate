@@ -17,17 +17,14 @@ public static class ServerPackageResolver
 
         var candidates = new[]
         {
-            // Bundled with app
             Path.Combine(AppContext.BaseDirectory, "server-bundle", "Gate.Server"),
             Path.Combine(Directory.GetCurrentDirectory(), "server-bundle", "Gate.Server"),
             Path.Combine(Directory.GetCurrentDirectory(), "Gate.Client", "server-bundle", "Gate.Server"),
 
-            // Published binaries
             Path.Combine(Directory.GetCurrentDirectory(), "Gate.Server", "bin", "Release", "net8.0", "linux-x64", "publish", "Gate.Server"),
             "/home/pilldev/CLionProjects/Gate/Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server",
             "/home/pilldev/RiderProjects/Gate/Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server",
 
-            // Sibling paths
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server")),
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server")),
         };

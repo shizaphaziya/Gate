@@ -41,7 +41,7 @@ public static class ThemeService
                 SetBrush(res, "GateBorderBrush", "#E5E7EB");
                 SetBrush(res, "GateTextPrimary", "#111827");
                 SetBrush(res, "GateTextSecondary", "#4B5563");
-                SetBrush(res, "GateTextTertiary", "#9CA3AF");
+                SetBrush(res, "GateTextTertiary", "#5F6673");
                 SetBrush(res, "GateAccent", "#2563EB");
                 SetBrush(res, "GateAccentFg", "#FFFFFF");
                 SetBrush(res, "GateBadgeBg", "#E5E7EB");
@@ -53,10 +53,11 @@ public static class ThemeService
                 SetBrush(res, "GateTerminalFg", "#58A6FF");
                 SetBrush(res, "GateTerminalLogsFg", "#E5E7EB");
                 SetBrush(res, "GateSelectionBg", "#DBEAFE");
+                SetBrush(res, "GateDangerText", "#B91C1C");
                 break;
 
             case AppTheme.Pink:
-                // Cute Pink Theme with Cat Paws and high contrast WCAG AAA plum text (:3 🐾)
+                // Plum text keeps AA contrast on the pink surfaces.
                 SetBrush(res, "GateBgApp", "#FFF0F5");            // LavenderBlush
                 SetBrush(res, "GateBgHeader", "#FFE4EC");         // Soft pastel rose header
                 SetBrush(res, "GateBgCard", "#FFFFFF");           // Crisp white card
@@ -65,8 +66,8 @@ public static class ThemeService
                 SetBrush(res, "GateBorderBrush", "#F8BBD0");      // Rose border
                 SetBrush(res, "GateTextPrimary", "#4A1525");      // Deep plum berry (contrast > 12:1)
                 SetBrush(res, "GateTextSecondary", "#88304E");    // Rose berry (contrast > 6:1)
-                SetBrush(res, "GateTextTertiary", "#AD5374");
-                SetBrush(res, "GateAccent", "#FF4081");           // Vibrant pink accent
+                SetBrush(res, "GateTextTertiary", "#9A3F61");
+                SetBrush(res, "GateAccent", "#C2185B");           // Vibrant pink accent
                 SetBrush(res, "GateAccentFg", "#FFFFFF");
                 SetBrush(res, "GateBadgeBg", "#FFD1DC");          // Pastel paw badge
                 SetBrush(res, "GateButtonNeutralBg", "#FFD6E0");
@@ -77,6 +78,7 @@ public static class ThemeService
                 SetBrush(res, "GateTerminalFg", "#FF80AB");       // Bright bubblegum text
                 SetBrush(res, "GateTerminalLogsFg", "#FFD1DC");   // Soft rose logs text
                 SetBrush(res, "GateSelectionBg", "#FCE4EC");
+                SetBrush(res, "GateDangerText", "#B91C1C");
                 break;
 
             case AppTheme.Dark:
@@ -89,7 +91,7 @@ public static class ThemeService
                 SetBrush(res, "GateBorderBrush", "#2B2D3A");
                 SetBrush(res, "GateTextPrimary", "#F3F4F6");
                 SetBrush(res, "GateTextSecondary", "#9CA3AF");
-                SetBrush(res, "GateTextTertiary", "#6B7280");
+                SetBrush(res, "GateTextTertiary", "#8B93A1");
                 SetBrush(res, "GateAccent", "#2563EB");
                 SetBrush(res, "GateAccentFg", "#FFFFFF");
                 SetBrush(res, "GateBadgeBg", "#262833");
@@ -101,6 +103,7 @@ public static class ThemeService
                 SetBrush(res, "GateTerminalFg", "#58A6FF");
                 SetBrush(res, "GateTerminalLogsFg", "#C9D1D9");
                 SetBrush(res, "GateSelectionBg", "#1E293B");
+                SetBrush(res, "GateDangerText", "#F87171");
                 break;
         }
     }

@@ -53,12 +53,10 @@ public class SshDeployerService
                 return result;
             }
 
-            // Step 1: Create remote directories
             Log("Step 1/6: Preparing directory structure at /opt/gate...");
             RunCommand("mkdir -p /opt/gate");
             Log("Directory /opt/gate is ready.");
 
-            // Step 2: Install and configure PostgreSQL (skip slow apt-get if already active)
             string pgCheck = RunCommand("systemctl is-active postgresql.service 2>/dev/null || echo 'inactive'").Trim();
             if (pgCheck == "active")
             {
@@ -103,7 +101,6 @@ public class SshDeployerService
             }
             Log("PostgreSQL database 'gatedb' and user 'gateuser' configured successfully.");
 
-            // Step 3: Create dummy-worker.service for testing
             Log("Step 3/6: Creating test systemd service /etc/systemd/system/dummy-worker.service...");
             string dummyWorkerService =
                 "[Unit]\n" +
@@ -123,7 +120,6 @@ public class SshDeployerService
             }
             Log("Created /etc/systemd/system/dummy-worker.service.");
 
-            // Step 4: Upload server binary and configuration
             Log("Step 4/6: Resolving and uploading Gate.Server binary and appsettings.json to /opt/gate/...");
             RunCommand("systemctl stop gate.service 2>/dev/null || true");
 
@@ -176,7 +172,6 @@ public class SshDeployerService
             RunCommand("chmod +x /opt/gate/Gate.Server");
             Log("Set execution permissions chmod +x on /opt/gate/Gate.Server.");
 
-            // Step 5: Write systemd unit gate.service
             Log("Step 5/6: Creating /etc/systemd/system/gate.service...");
             string gateService =
                 "[Unit]\n" +
@@ -198,7 +193,6 @@ public class SshDeployerService
             }
             Log("Installed /etc/systemd/system/gate.service.");
 
-            // Step 6: Reload daemon and enable services
             Log("Step 6/6: Reloading systemd daemon and enabling services...");
             RunCommand("systemctl daemon-reload && systemctl enable --now dummy-worker.service && systemctl enable --now gate.service");
 
@@ -248,7 +242,6 @@ public class SshDeployerService
                 return cmd.Execute().Trim();
             }
 
-            // 1. Проверяем наличие установленных компонентов Gate
             Log("Шаг 1: Проверка наличия бинарника и службы Gate...");
             string binaryCheck = RunCommand("test -f /opt/gate/Gate.Server && echo 'exists' || echo 'missing'");
             string serviceCheck = RunCommand("test -f /etc/systemd/system/gate.service && echo 'exists' || echo 'missing'");
@@ -262,7 +255,6 @@ public class SshDeployerService
 
             Log("Файлы /opt/gate/Gate.Server и gate.service присутствуют. Gate установлен.");
 
-            // 2. Проверяем работоспособность служб
             Log("Шаг 2: Проверка состояния gate.service и postgresql.service...");
             string gateStatus = RunCommand("systemctl is-active gate.service 2>/dev/null || echo 'inactive'");
             string pgStatus = RunCommand("systemctl is-active postgresql.service 2>/dev/null || echo 'inactive'");
@@ -276,14 +268,11 @@ public class SshDeployerService
                 return new CheckResult(true, true, false, "Gate уже установлен и работает на порту 5050.");
             }
 
-            // 3. Gate установлен, но не работает: автоматическая починка
             Log("ВНИМАНИЕ: Gate установлен, но служба не запущена или остановлена. Запуск автоматической починки...");
 
-            // Шаг 3.1: Восстановление прав на исполнение
             Log("Починка 1/4: Восстановление прав на запуск /opt/gate/Gate.Server...");
             RunCommand("chmod +x /opt/gate/Gate.Server");
 
-            // Шаг 3.2: Проверка и перезапуск PostgreSQL и создание БД при необходимости
             Log("Починка 2/4: Проверка и запуск службы PostgreSQL...");
             RunCommand("systemctl daemon-reload && systemctl enable --now postgresql.service 2>/dev/null || systemctl restart postgresql.service 2>/dev/null || true");
             string ensureDbScript =
@@ -293,12 +282,10 @@ public class SshDeployerService
                 "sudo -u postgres psql -c \"CREATE DATABASE gatedb OWNER gateuser;\" 2>/dev/null";
             RunCommand(ensureDbScript);
 
-            // Шаг 3.3: Перезагрузка демонов systemd и запуск служб
             Log("Починка 3/4: Перезагрузка юнитов systemd и перезапуск gate.service...");
             RunCommand("systemctl daemon-reload && systemctl enable --now dummy-worker.service 2>/dev/null || true");
             RunCommand("systemctl restart gate.service");
 
-            // Шаг 3.4: Финальная валидация
             System.Threading.Thread.Sleep(1500);
             string finalStatus = RunCommand("systemctl is-active gate.service 2>/dev/null || echo 'inactive'");
             Log($"Починка 4/4: Итоговое состояние gate.service: {finalStatus}");

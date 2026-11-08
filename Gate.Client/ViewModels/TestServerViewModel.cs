@@ -16,7 +16,7 @@ public partial class TestServerViewModel : ViewModelBase
     private string _statusText = "Опрос...";
 
     [ObservableProperty]
-    private string _statusColor = "#6B7280";
+    private string _statusColor = "#4B5563";
 
     [ObservableProperty]
     private bool _isRunning = false;

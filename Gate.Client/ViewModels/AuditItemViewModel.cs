@@ -1,8 +1,10 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using Gate.Client.Services;
 using Gate.Shared;
 
 namespace Gate.Client.ViewModels;
 
-public class AuditItemViewModel
+public class AuditItemViewModel : ViewModelBase
 {
     public int Id { get; }
     public string Username { get; }
@@ -13,19 +15,50 @@ public class AuditItemViewModel
 
     public string TimeDisplay => ExecutedAt.ToString("HH:mm:ss (UTC)");
 
-    public string StatusColor => Status switch
+    public string ActionDisplay => Action switch
     {
-        "SUCCESS" => "#10B981",
-        "FORBIDDEN" => "#EF4444",
-        _ => "#F59E0B"
+        "Start" => "Запуск",
+        "Stop" => "Остановка",
+        "Restart" => "Перезапуск",
+        "Status" => "Статус",
+        "ViewLogs" => "Логи",
+        _ => Action
     };
 
-    public string StatusBgColor => Status switch
+    public string StatusDisplay => Status switch
     {
-        "SUCCESS" => "#163828",
-        "FORBIDDEN" => "#3B1818",
-        _ => "#382914"
+        "SUCCESS" => "Успешно",
+        "FORBIDDEN" => "Запрещено",
+        "ERROR" => "Ошибка",
+        _ => Status
     };
+
+    public string StatusColor => Status switch
+    {
+        "SUCCESS" => StatusPalette.Ok,
+        "FORBIDDEN" => StatusPalette.Error,
+        _ => StatusPalette.Warn
+    };
+
+    public string StatusBgColor => (ThemeService.CurrentTheme == AppTheme.Dark)
+        ? Status switch
+        {
+            "SUCCESS" => "#163828",
+            "FORBIDDEN" => "#3B1818",
+            _ => "#382914"
+        }
+        : Status switch
+        {
+            "SUCCESS" => "#D1FAE5",
+            "FORBIDDEN" => "#FEE2E2",
+            _ => "#FEF3C7"
+        };
+
+    public void RefreshTheme()
+    {
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(StatusBgColor));
+    }
 
     public AuditItemViewModel(AuditLogDto dto)
     {

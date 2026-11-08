@@ -8,59 +8,12 @@
         x:Class="Gate.Client.Views.MainWindow"
         x:Name="RootWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Gate - Remote Systemd &amp; Journalctl Management"
+        Title="Gate: управление systemd и journalctl"
         Width="1180" Height="820"
         MinWidth="950" MinHeight="650"
         Background="{DynamicResource GateBgApp}">
 
     <Panel>
-        <!-- Background Paw Pattern Layer (Visible only in Pink Theme) -->
-        <Canvas IsHitTestVisible="False" IsVisible="{Binding IsPinkTheme}">
-            <!-- Top Left Paws -->
-            <materialIcons:MaterialIcon Kind="Paw" Width="64" Height="64"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.12"
-                                        Canvas.Left="20" Canvas.Top="80">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="-25" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-
-            <materialIcons:MaterialIcon Kind="Paw" Width="44" Height="44"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.09"
-                                        Canvas.Left="85" Canvas.Top="125">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="15" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-
-            <!-- Top Right Paws -->
-            <materialIcons:MaterialIcon Kind="Paw" Width="56" Height="56"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.11"
-                                        Canvas.Right="30" Canvas.Top="85">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="30" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-
-            <!-- Bottom Left Paws -->
-            <materialIcons:MaterialIcon Kind="Paw" Width="68" Height="68"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.12"
-                                        Canvas.Left="35" Canvas.Bottom="60">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="20" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-
-            <!-- Bottom Right Paws -->
-            <materialIcons:MaterialIcon Kind="Paw" Width="82" Height="82"
-                                        Foreground="{DynamicResource GateAccent}" Opacity="0.13"
-                                        Canvas.Right="35" Canvas.Bottom="55">
-                <materialIcons:MaterialIcon.RenderTransform>
-                    <RotateTransform Angle="-35" />
-                </materialIcons:MaterialIcon.RenderTransform>
-            </materialIcons:MaterialIcon>
-        </Canvas>
-
         <!-- Main Window Structure -->
         <Grid RowDefinitions="Auto, *, Auto">
 
@@ -74,16 +27,15 @@
                                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="GATE SYSTEM CONTROL" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource GateTextPrimary}" />
-                            <TextBlock Text="Безопасное управление службами Linux (systemd) и журналами логов (journalctl)" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                            <TextBlock Text="Gate: управление службами" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource GateTextPrimary}" />
+                            <TextBlock Text="Службы systemd и журналы journalctl" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                         <!-- Theme Selector -->
                         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0,0,4,0">
-                            <TextBlock Text="Тема:" FontSize="12" Foreground="{DynamicResource GateTextSecondary}" VerticalAlignment="Center" />
-                            <ComboBox ItemsSource="{Binding ThemeList}"
+                            <ComboBox ItemsSource="{Binding ThemeList}" AutomationProperties.Name="Тема"
                                       SelectedItem="{Binding SelectedTheme}"
                                       Width="135"
                                       Background="{DynamicResource GateBgInput}"
@@ -104,7 +56,7 @@
 
                         <!-- Dedicated Test Server Window Button -->
                         <Button Command="{Binding OpenTestServerWindowCommand}"
-                                Background="{DynamicResource GateAccent}" Foreground="{DynamicResource GateAccentFg}"
+                                Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}"
                                 Padding="10,6" CornerRadius="6" FontSize="12">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <materialIcons:MaterialIcon Kind="Linux" Width="15" Height="15" />
@@ -134,10 +86,7 @@
                 </Grid>
             </Border>
 
-            <!-- ======================================================== -->
-            <!-- STATE 1: NOT LOGGED IN (Connection & SSH Deploy Hub)     -->
-            <!-- No confusing 3 tabs! One focused, intuitive screen.      -->
-            <!-- ======================================================== -->
+            <!-- Signed out: login and SSH deploy -->
             <ScrollViewer Grid.Row="1" IsVisible="{Binding !IsLoggedIn}" VerticalScrollBarVisibility="Auto">
                 <Border Background="{DynamicResource GateBgCard}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="1"
                         CornerRadius="12" Padding="28" MaxWidth="720" Margin="24,20" HorizontalAlignment="Center">
@@ -147,7 +96,7 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0" Spacing="4">
                                 <TextBlock Text="Подключение к Gate" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource GateTextPrimary}" />
-                                <TextBlock Text="Выберите способ авторизации или разверните шлюз на новом сервере по SSH" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                                <TextBlock Text="Выберите способ авторизации или разверните шлюз на новом сервере по SSH" TextWrapping="Wrap" Margin="0,0,16,0" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
                             </StackPanel>
 
                             <!-- Segmented Switcher (Login vs SSH Deploy) -->
@@ -227,7 +176,7 @@
                                          Height="4" CornerRadius="2" />
 
                             <TextBlock Text="{Binding LoginErrorMessage}"
-                                       Foreground="#EF4444" FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource GateDangerText}" FontSize="12" TextWrapping="Wrap"
                                        IsVisible="{Binding LoginErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
                             <Separator Background="{DynamicResource GateBorderBrush}" Margin="0,4" />
@@ -239,17 +188,17 @@
                                     <Button Grid.Column="0"
                                             Command="{Binding QuickLoginAsAdminCommand}"
                                             Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                            Background="#1E3A8A" Foreground="#BFDBFE" FontSize="11" Padding="6,8" CornerRadius="6">
+                                            Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="6,8" CornerRadius="6">
                                         <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
                                             <materialIcons:MaterialIcon Kind="ShieldStar" Width="14" Height="14" />
-                                            <TextBlock Text="Admin (*)" VerticalAlignment="Center" />
+                                            <TextBlock Text="Admin" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </Button>
 
                                     <Button Grid.Column="1"
                                             Command="{Binding QuickLoginAsDevCommand}"
                                             Margin="4,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                            Background="#14532D" Foreground="#BBF7D0" FontSize="11" Padding="6,8" CornerRadius="6">
+                                            Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="6,8" CornerRadius="6">
                                         <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
                                             <materialIcons:MaterialIcon Kind="CodeBraces" Width="14" Height="14" />
                                             <TextBlock Text="Dev" VerticalAlignment="Center" />
@@ -259,7 +208,7 @@
                                     <Button Grid.Column="2"
                                             Command="{Binding QuickLoginAsAuditorCommand}"
                                             Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                            Background="#701A75" Foreground="#F5D0FE" FontSize="11" Padding="6,8" CornerRadius="6">
+                                            Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="6,8" CornerRadius="6">
                                         <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
                                             <materialIcons:MaterialIcon Kind="FileEyeOutline" Width="14" Height="14" />
                                             <TextBlock Text="Auditor" VerticalAlignment="Center" />
@@ -367,7 +316,7 @@
                                         IsEnabled="{Binding !IsCheckingServer}"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
-                                        Background="#047857" Foreground="White"
+                                        Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}"
                                         FontWeight="Bold" FontSize="12"
                                         Padding="10,9" CornerRadius="6" Margin="4,0,0,0">
                                     <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
@@ -386,7 +335,7 @@
                                         Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}"
                                         FontSize="11" Padding="10,6" CornerRadius="6">
                                     <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <materialIcons:MaterialIcon Kind="Restore" Width="14" Height="14" Foreground="#EF4444" />
+                                        <materialIcons:MaterialIcon Kind="Restore" Width="14" Height="14" Foreground="{DynamicResource GateDangerText}" />
                                         <TextBlock Text="Сбросить Gate на сервере" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
@@ -436,10 +385,7 @@
                 </Border>
             </ScrollViewer>
 
-            <!-- ======================================================== -->
-            <!-- STATE 2: LOGGED IN (Primary Management Workspace)         -->
-            <!-- Zero tabs overhead! Full window space dedicated to work. -->
-            <!-- ======================================================== -->
+            <!-- Signed in: services, journal, audit -->
             <Grid Grid.Row="1" IsVisible="{Binding IsLoggedIn}" ColumnDefinitions="460, *" Margin="14,10">
 
                 <!-- Left Column: Services List (systemd) -->
@@ -462,6 +408,9 @@
                             </Button>
                         </Grid>
 
+                        <TextBlock Grid.Row="1" Text="Службы не загружены. Нажмите «Обновить»." FontSize="12"
+                                   Foreground="{DynamicResource GateTextSecondary}" TextWrapping="Wrap"
+                                   IsVisible="{Binding !Services.Count}" />
                         <ScrollViewer Grid.Row="1">
                             <ItemsControl ItemsSource="{Binding Services}">
                                 <ItemsControl.ItemTemplate>
@@ -473,63 +422,55 @@
                                                 <Grid ColumnDefinitions="*, Auto">
                                                     <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource GateTextPrimary}" VerticalAlignment="Center" />
                                                     <Border Grid.Column="1" Background="{Binding StatusColor}" CornerRadius="12" Padding="8,2">
-                                                        <TextBlock Text="{Binding StateText}" FontSize="10" FontWeight="Bold" Foreground="White" />
+                                                        <TextBlock Text="{Binding StateText}" FontSize="11" FontWeight="Bold" Foreground="White" />
                                                     </Border>
                                                 </Grid>
 
                                                 <!-- Description -->
                                                 <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" TextWrapping="Wrap" />
 
-                                                <!-- Controls: Start, Stop, Restart, Logs -->
-                                                <Grid ColumnDefinitions="*, *, *, *">
-                                                    <Button Grid.Column="0"
-                                                            Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
-                                                            CommandParameter="{Binding Name, StringFormat='{}{0}:Start'}"
-                                                            IsEnabled="{Binding CanManage}"
-                                                            Margin="0,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                            Background="#059669" Foreground="White" FontSize="11" Padding="4,5" CornerRadius="4">
-                                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                            <materialIcons:MaterialIcon Kind="PlayArrow" Width="13" Height="13" />
-                                                            <TextBlock Text="Start" VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </Button>
-
-                                                    <Button Grid.Column="1"
-                                                            Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
-                                                            CommandParameter="{Binding Name, StringFormat='{}{0}:Stop'}"
-                                                            IsEnabled="{Binding CanManage}"
-                                                            Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                            Background="#DC2626" Foreground="White" FontSize="11" Padding="4,5" CornerRadius="4">
-                                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                            <materialIcons:MaterialIcon Kind="StopCircle" Width="13" Height="13" />
-                                                            <TextBlock Text="Stop" VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </Button>
-
-                                                    <Button Grid.Column="2"
-                                                            Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
-                                                            CommandParameter="{Binding Name, StringFormat='{}{0}:Restart'}"
-                                                            IsEnabled="{Binding CanManage}"
-                                                            Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                            Background="#D97706" Foreground="White" FontSize="11" Padding="4,5" CornerRadius="4">
-                                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                            <materialIcons:MaterialIcon Kind="Restart" Width="13" Height="13" />
-                                                            <TextBlock Text="Restart" VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </Button>
-
-                                                    <Button Grid.Column="3"
-                                                            Command="{Binding #RootWindow.DataContext.LoadLogsCommand}"
-                                                            CommandParameter="{Binding Name}"
-                                                            IsEnabled="{Binding CanViewLogs}"
-                                                            Margin="2,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                                            Background="{DynamicResource GateAccent}" Foreground="{DynamicResource GateAccentFg}" FontSize="11" Padding="4,5" CornerRadius="4">
-                                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                            <materialIcons:MaterialIcon Kind="FileDocumentOutline" Width="13" Height="13" />
-                                                            <TextBlock Text="Логи" VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </Button>
-                                                </Grid>
+                                                <!-- Only the actions valid for the current state are shown -->
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <Button Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
+                                                        CommandParameter="{Binding Name, StringFormat='{}{0}:Start'}"
+                                                        IsEnabled="{Binding CanManage}"
+                                                        IsVisible="{Binding !IsActive}"
+                                                        Background="{DynamicResource GateSuccess}" Foreground="White" FontSize="11" Padding="10,5" CornerRadius="4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <materialIcons:MaterialIcon Kind="PlayArrow" Width="13" Height="13" />
+                                                        <TextBlock Text="Запустить" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
+                                                        CommandParameter="{Binding Name, StringFormat='{}{0}:Stop'}"
+                                                        IsEnabled="{Binding CanManage}"
+                                                        IsVisible="{Binding IsActive}"
+                                                        Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="10,5" CornerRadius="4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <materialIcons:MaterialIcon Kind="StopCircle" Width="13" Height="13" />
+                                                        <TextBlock Text="Остановить" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Command="{Binding #RootWindow.DataContext.ExecuteServiceActionCommand}"
+                                                        CommandParameter="{Binding Name, StringFormat='{}{0}:Restart'}"
+                                                        IsEnabled="{Binding CanManage}"
+                                                        IsVisible="{Binding IsActive}"
+                                                        Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="10,5" CornerRadius="4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <materialIcons:MaterialIcon Kind="Restart" Width="13" Height="13" />
+                                                        <TextBlock Text="Перезапустить" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Command="{Binding #RootWindow.DataContext.LoadLogsCommand}"
+                                                        CommandParameter="{Binding Name}"
+                                                        IsEnabled="{Binding CanViewLogs}"
+                                                        Background="{DynamicResource GateButtonNeutralBg}" Foreground="{DynamicResource GateTextPrimary}" FontSize="11" Padding="10,5" CornerRadius="4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <materialIcons:MaterialIcon Kind="FileDocumentOutline" Width="13" Height="13" />
+                                                        <TextBlock Text="Логи" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                                </StackPanel>
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
@@ -611,28 +552,31 @@
 
                             <!-- Column Headers -->
                             <Border Grid.Row="1" Background="{DynamicResource GateAuditHeaderBg}" CornerRadius="4" Padding="8,4" Margin="0,0,0,4">
-                                <Grid ColumnDefinitions="110, 80, 160, 90, *">
-                                    <TextBlock Grid.Column="0" Text="Время (UTC)" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" />
-                                    <TextBlock Grid.Column="1" Text="Пользователь" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" />
-                                    <TextBlock Grid.Column="2" Text="Служба" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" />
-                                    <TextBlock Grid.Column="3" Text="Действие" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" />
-                                    <TextBlock Grid.Column="4" Text="Статус" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource GateTextSecondary}" />
+                                <Grid ColumnDefinitions="110, 110, 160, 90, *">
+                                    <TextBlock Grid.Column="0" Text="Время (UTC)" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                                    <TextBlock Grid.Column="1" Text="Пользователь" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                                    <TextBlock Grid.Column="2" Text="Служба" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                                    <TextBlock Grid.Column="3" Text="Действие" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
+                                    <TextBlock Grid.Column="4" Text="Статус" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" />
                                 </Grid>
                             </Border>
 
+                            <TextBlock Grid.Row="2" Text="Записей аудита пока нет." FontSize="12"
+                                       Foreground="{DynamicResource GateTextSecondary}"
+                                       IsVisible="{Binding !AuditLogs.Count}" />
                             <ScrollViewer Grid.Row="2">
                                 <ItemsControl ItemsSource="{Binding AuditLogs}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:AuditItemViewModel">
                                             <Border Background="{DynamicResource GateAuditRowBg}" BorderBrush="{DynamicResource GateBorderBrush}" BorderThickness="1"
                                                     CornerRadius="4" Padding="8,4" Margin="0,0,0,4">
-                                                <Grid ColumnDefinitions="110, 80, 160, 90, *">
+                                                <Grid ColumnDefinitions="110, 110, 160, 90, *">
                                                     <TextBlock Grid.Column="0" Text="{Binding TimeDisplay}" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" VerticalAlignment="Center" />
-                                                    <TextBlock Grid.Column="1" Text="{Binding Username}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource GateAccent}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Username}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource GateTextPrimary}" VerticalAlignment="Center" />
                                                     <TextBlock Grid.Column="2" Text="{Binding ServiceName}" FontSize="11" Foreground="{DynamicResource GateTextPrimary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Grid.Column="3" Text="{Binding Action}" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="3" Text="{Binding ActionDisplay}" FontSize="11" Foreground="{DynamicResource GateTextSecondary}" VerticalAlignment="Center" />
                                                     <Border Grid.Column="4" Background="{Binding StatusBgColor}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
-                                                        <TextBlock Text="{Binding Status}" Foreground="{Binding StatusColor}" FontWeight="Bold" FontSize="10" />
+                                                        <TextBlock Text="{Binding StatusDisplay}" Foreground="{Binding StatusColor}" FontWeight="Bold" FontSize="11" />
                                                     </Border>
                                                 </Grid>
                                             </Border>

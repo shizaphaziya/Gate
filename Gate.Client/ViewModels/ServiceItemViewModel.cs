@@ -15,6 +15,7 @@ public partial class ServiceItemViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StateText))]
     [NotifyPropertyChangedFor(nameof(StatusColor))]
+    [NotifyPropertyChangedFor(nameof(IsActive))]
     private ServiceState _state;
 
     [ObservableProperty]
@@ -33,7 +34,7 @@ public partial class ServiceItemViewModel : ViewModelBase
     }
 
     public string CardBorderBrush => IsSelected
-        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#FF4081" : "#3B82F6")
+        ? (ThemeService.CurrentTheme == AppTheme.Pink ? "#C2185B" : "#3B82F6")
         : (ThemeService.CurrentTheme == AppTheme.Light ? "#E5E7EB" : ThemeService.CurrentTheme == AppTheme.Pink ? "#F8BBD0" : "#2B2D3A");
 
     public ServiceItemViewModel(ServiceInfoDto dto)
@@ -45,19 +46,21 @@ public partial class ServiceItemViewModel : ViewModelBase
         _canViewLogs = dto.CanViewLogs;
     }
 
+    public bool IsActive => State == ServiceState.Active;
+
     public string StateText => State switch
     {
-        ServiceState.Active => "Active",
-        ServiceState.Inactive => "Inactive",
-        ServiceState.Failed => "Failed",
-        _ => "Unknown"
+        ServiceState.Active => "Работает",
+        ServiceState.Inactive => "Остановлена",
+        ServiceState.Failed => "Сбой",
+        _ => "Неизвестно"
     };
 
     public string StatusColor => State switch
     {
-        ServiceState.Active => "#10B981",    // Green
-        ServiceState.Inactive => "#EF4444",  // Red
-        ServiceState.Failed => "#DC2626",    // Dark Red
-        _ => "#6B7280"                       // Gray
+        ServiceState.Active => "#047857",
+        ServiceState.Inactive => "#B91C1C",
+        ServiceState.Failed => "#7F1D1D",
+        _ => "#4B5563"
     };
 }
