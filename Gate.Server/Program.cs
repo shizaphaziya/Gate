@@ -19,6 +19,7 @@ builder.ConfigureServices((hostContext, services) =>
         options.UseNpgsql(connectionString);
     });
 
+    services.AddSingleton<TlsCertificateProvider>();
     services.AddSingleton<SystemdManager>();
     services.AddSingleton<PermissionChecker>();
     services.AddHostedService<TcpGateServer>();

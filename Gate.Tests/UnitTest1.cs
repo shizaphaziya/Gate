@@ -34,6 +34,40 @@ public class GateTests
     }
 
     [Fact]
+    public void CertificateTrustStore_PinsOnFirstUse_AndRejectsChangedCertificate()
+    {
+        string storePath = Path.Combine(Path.GetTempPath(), $"gate-known-hosts-{Guid.NewGuid():N}.json");
+        string? previous = Environment.GetEnvironmentVariable(CertificateTrustStore.KnownHostsEnvVar);
+        Environment.SetEnvironmentVariable(CertificateTrustStore.KnownHostsEnvVar, storePath);
+
+        try
+        {
+            Assert.Equal(CertificateTrust.TrustedOnFirstUse, CertificateTrustStore.Verify("10.0.0.5", 5050, "AAAA"));
+            Assert.Equal(CertificateTrust.Trusted, CertificateTrustStore.Verify("10.0.0.5", 5050, "aaaa"));
+            Assert.Equal(CertificateTrust.Mismatch, CertificateTrustStore.Verify("10.0.0.5", 5050, "BBBB"));
+
+            // A different host:port is tracked independently.
+            Assert.Equal(CertificateTrust.TrustedOnFirstUse, CertificateTrustStore.Verify("10.0.0.6", 5050, "BBBB"));
+
+            // After forgetting (or pinning explicitly) the new certificate is accepted.
+            CertificateTrustStore.Forget("10.0.0.5", 5050);
+            Assert.Equal(CertificateTrust.TrustedOnFirstUse, CertificateTrustStore.Verify("10.0.0.5", 5050, "BBBB"));
+
+            CertificateTrustStore.Pin("10.0.0.5", 5050, "CCCC");
+            Assert.Equal(CertificateTrust.Trusted, CertificateTrustStore.Verify("10.0.0.5", 5050, "CCCC"));
+            Assert.Equal(CertificateTrust.Mismatch, CertificateTrustStore.Verify("10.0.0.5", 5050, "BBBB"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(CertificateTrustStore.KnownHostsEnvVar, previous);
+            if (File.Exists(storePath))
+            {
+                File.Delete(storePath);
+            }
+        }
+    }
+
+    [Fact]
     public void PermissionChecker_RbacRules_EnforcesStrictAccessControls()
     {
         var checker = new PermissionChecker();
@@ -73,8 +107,9 @@ public class GateTests
     [Fact]
     public async Task SshDeployer_And_GateClient_FullIntegrationTest()
     {
-        string binaryPath = "/home/pilldev/CLionProjects/Gate/Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server";
-        if (!File.Exists(binaryPath))
+        // Binary is located via GATE_SERVER_BINARY or relative to the repository root (see ServerPackageResolver).
+        string binaryPath = ServerPackageResolver.ResolveBinaryPath();
+        if (string.IsNullOrEmpty(binaryPath) || !File.Exists(binaryPath))
         {
             // Skip integration test if binary not built yet
             return;

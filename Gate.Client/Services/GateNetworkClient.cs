@@ -1,5 +1,7 @@
 using System.IO;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using Gate.Shared;
 
 namespace Gate.Client.Services;
@@ -7,7 +9,7 @@ namespace Gate.Client.Services;
 public class GateNetworkClient : IDisposable
 {
     private TcpClient? _tcpClient;
-    private NetworkStream? _stream;
+    private Stream? _stream;
     private readonly SemaphoreSlim _sendLock = new(1, 1);
 
     public bool IsConnected => _tcpClient != null && _tcpClient.Connected;
@@ -21,7 +23,47 @@ public class GateNetworkClient : IDisposable
 
         _tcpClient = new TcpClient();
         await _tcpClient.ConnectAsync(host, port, ct);
-        _stream = _tcpClient.GetStream();
+
+        // The server uses a self-signed certificate, so it is pinned per host:port (see CertificateTrustStore).
+        bool certificateMismatch = false;
+        var sslStream = new SslStream(
+            _tcpClient.GetStream(),
+            leaveInnerStreamOpen: false,
+            (_, certificate, _, _) =>
+            {
+                if (certificate == null)
+                {
+                    return false;
+                }
+
+                string fingerprint = CertificateTrustStore.Fingerprint(certificate.GetRawCertData());
+                var trust = CertificateTrustStore.Verify(host, port, fingerprint);
+                certificateMismatch = trust == CertificateTrust.Mismatch;
+                return !certificateMismatch;
+            });
+
+        try
+        {
+            await sslStream.AuthenticateAsClientAsync(new SslClientAuthenticationOptions
+            {
+                TargetHost = host,
+                EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+            }, ct);
+        }
+        catch (Exception ex) when (ex is AuthenticationException or IOException)
+        {
+            sslStream.Dispose();
+            Disconnect();
+
+            string message = certificateMismatch
+                ? $"Сертификат сервера {host}:{port} не совпадает с сохранённым. Возможна подмена сервера. " +
+                  "Если Gate был переустановлен, переустановите его через приложение или удалите запись о хосте в " +
+                  CertificateTrustStore.StorePath + "."
+                : "Не удалось установить защищённое соединение (TLS): " + ex.Message;
+            return new AuthResponseDto(false, null, null, message);
+        }
+
+        _stream = sslStream;
 
         var authRequest = NetworkPacket.Create(PacketType.AuthRequest, new AuthRequestDto(username, password));
         var responsePacket = await SendAndReceiveAsync(authRequest, ct);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,28 +15,28 @@ public record ContainerStatusInfo(
 
 public class TestServerManager
 {
+    /// <summary>Environment variable with an explicit path to the test-env folder (with docker-compose.yml).</summary>
+    public const string TestEnvDirEnvVar = "GATE_TEST_ENV_DIR";
+
     private static string FindTestEnvDir()
     {
-        var candidates = new[]
+        var candidates = new List<string?>
         {
+            Environment.GetEnvironmentVariable(TestEnvDirEnvVar),
             Path.Combine(Directory.GetCurrentDirectory(), "test-env"),
-            "/home/pilldev/CLionProjects/Gate/test-env",
-            "/home/pilldev/RiderProjects/Gate/test-env",
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../test-env")),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../test-env")),
+            RepoLocator.InRepo("test-env"),
         };
 
         foreach (var c in candidates)
         {
-            if (Directory.Exists(c) && File.Exists(Path.Combine(c, "docker-compose.yml")))
+            if (!string.IsNullOrWhiteSpace(c) && Directory.Exists(c) && File.Exists(Path.Combine(c, "docker-compose.yml")))
             {
-                return c;
+                return Path.GetFullPath(c);
             }
         }
 
-        return Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "test-env"))
-            ? Path.Combine(Directory.GetCurrentDirectory(), "test-env")
-            : "/home/pilldev/CLionProjects/Gate/test-env";
+        // Nothing found: fall back to ./test-env so that the error message points at a sensible location.
+        return Path.Combine(Directory.GetCurrentDirectory(), "test-env");
     }
 
     public async Task<ContainerStatusInfo> GetStatusAsync()
@@ -105,6 +106,9 @@ public class TestServerManager
         var dir = FindTestEnvDir();
         onLog($"[{DateTime.Now:HH:mm:ss}] Полная пересборка контейнера через docker compose (директория: {dir})...");
         await RunStreamAsync("docker", $"compose -f {Path.Combine(dir, "docker-compose.yml")} up -d --build --force-recreate", onLog);
+
+        // A recreated container has no Gate installation (and no certificate) any more.
+        CertificateTrustStore.Forget("127.0.0.1", 5050);
         onLog($"[{DateTime.Now:HH:mm:ss}] Пересборка завершена.");
     }
 
@@ -128,6 +132,9 @@ public class TestServerManager
             "systemctl reset-failed 2>/dev/null || true";
 
         await RunStreamAsync("docker", $"exec gate-test-linux bash -c \"{resetCmd}\"", onLog);
+
+        // The server certificate lived in /opt/gate and is gone now: forget the pinned fingerprint.
+        CertificateTrustStore.Forget("127.0.0.1", 5050);
         onLog($"[{DateTime.Now:HH:mm:ss}] Сброс завершен успешно! Сервер возвращен в исходное чистое состояние.");
         onLog($"[{DateTime.Now:HH:mm:ss}] Теперь можно выполнить чистую установку Gate через вкладку «Установка по SSH».");
     }

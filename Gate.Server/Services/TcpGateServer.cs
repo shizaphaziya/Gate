@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using Gate.Server.Database;
 using Gate.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -18,19 +20,24 @@ public class TcpGateServer : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly SystemdManager _systemd;
     private readonly PermissionChecker _permissionChecker;
+    private readonly TlsCertificateProvider _tlsCertificates;
     private readonly ConcurrentDictionary<string, UserSession> _sessions = new();
     private readonly int _port = 5050;
+
+    private static readonly TimeSpan TlsHandshakeTimeout = TimeSpan.FromSeconds(10);
 
     public TcpGateServer(
         ILogger<TcpGateServer> logger,
         IServiceScopeFactory scopeFactory,
         SystemdManager systemd,
-        PermissionChecker permissionChecker)
+        PermissionChecker permissionChecker,
+        TlsCertificateProvider tlsCertificates)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
         _systemd = systemd;
         _permissionChecker = permissionChecker;
+        _tlsCertificates = tlsCertificates;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,8 +45,11 @@ public class TcpGateServer : BackgroundService
         var listener = new TcpListener(IPAddress.Any, _port);
         try
         {
+            // Load (or generate) the certificate before accepting connections.
+            _ = _tlsCertificates.Certificate;
+
             listener.Start();
-            _logger.LogInformation("Gate TCP Server started listening on port {Port}", _port);
+            _logger.LogInformation("Gate TCP Server (TLS) started listening on port {Port}", _port);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -64,13 +74,28 @@ public class TcpGateServer : BackgroundService
     private async Task HandleClientAsync(TcpClient client, CancellationToken ct)
     {
         using (client)
-        using (NetworkStream stream = client.GetStream())
+        using (NetworkStream networkStream = client.GetStream())
         {
             string clientEndpoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
             _logger.LogInformation("Client connected: {Endpoint}", clientEndpoint);
 
             try
             {
+                using var sslStream = new SslStream(networkStream, leaveInnerStreamOpen: false);
+
+                using (var handshakeCts = CancellationTokenSource.CreateLinkedTokenSource(ct))
+                {
+                    handshakeCts.CancelAfter(TlsHandshakeTimeout);
+                    await sslStream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
+                    {
+                        ServerCertificate = _tlsCertificates.Certificate,
+                        ClientCertificateRequired = false,
+                        EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+                    }, handshakeCts.Token);
+                }
+
+                Stream stream = sslStream;
+
                 while (!ct.IsCancellationRequested)
                 {
                     NetworkPacket? packet = await PacketProtocol.ReadPacketAsync(stream, ct);
@@ -83,6 +108,10 @@ public class TcpGateServer : BackgroundService
                     NetworkPacket response = await ProcessPacketAsync(packet, ct);
                     await PacketProtocol.SendPacketAsync(stream, response, ct);
                 }
+            }
+            catch (AuthenticationException ex)
+            {
+                _logger.LogWarning("TLS handshake failed for client {Endpoint}: {Message}", clientEndpoint, ex.Message);
             }
             catch (Exception ex) when (ex is IOException or SocketException or OperationCanceledException)
             {

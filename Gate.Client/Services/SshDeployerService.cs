@@ -6,6 +6,9 @@ namespace Gate.Client.Services;
 
 public class SshDeployerService
 {
+    /// <summary>TCP port of Gate.Server (hardcoded in TcpGateServer).</summary>
+    private const int GateServerPort = 5050;
+
     public async Task DeployAsync(
         string host,
         int port,
@@ -183,7 +186,8 @@ public class SshDeployerService
                 "ExecStart=/opt/gate/Gate.Server\n" +
                 "Restart=always\n" +
                 "User=root\n" +
-                "Environment=DOTNET_ENVIRONMENT=Production\n\n" +
+                "Environment=DOTNET_ENVIRONMENT=Production\n" +
+                "Environment=Gate__Tls__CertificatePath=/opt/gate/gate-server.pfx\n\n" +
                 "[Install]\n" +
                 "WantedBy=multi-user.target\n";
 
@@ -198,6 +202,36 @@ public class SshDeployerService
 
             string statusOutput = RunCommand("systemctl is-active gate.service || true");
             Log($"Gate service activation status: {statusOutput.Trim()}");
+
+            // Pin the server's TLS certificate over the (authenticated) SSH channel, so the first
+            // Gate connection does not have to trust an unknown certificate blindly.
+            string tlsFingerprint = string.Empty;
+            if (statusOutput.Trim() == "active")
+            {
+                for (int attempt = 0; attempt < 5 && tlsFingerprint.Length != 64; attempt++)
+                {
+                    string candidate = RunCommand("cat /opt/gate/gate-server.pfx.sha256 2>/dev/null || true").Trim();
+                    if (candidate.Length == 64)
+                    {
+                        tlsFingerprint = candidate;
+                    }
+                    else
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            }
+
+            if (tlsFingerprint.Length == 64)
+            {
+                CertificateTrustStore.Pin(host, GateServerPort, tlsFingerprint);
+                Log($"Pinned Gate TLS certificate for {host}:{GateServerPort} (SHA-256 {tlsFingerprint}).");
+            }
+            else
+            {
+                CertificateTrustStore.Forget(host, GateServerPort);
+                Log($"Notice: could not read the TLS certificate fingerprint. The certificate of {host}:{GateServerPort} will be trusted on first connection.");
+            }
 
             Log("=== Automated installation and configuration finished successfully! ===");
         }, ct);
@@ -351,6 +385,9 @@ public class SshDeployerService
 
             Log("Перезагрузка конфигурации systemd...");
             RunCommand("systemctl daemon-reload && systemctl reset-failed 2>/dev/null || true");
+
+            // The server certificate was deleted together with /opt/gate: forget the pinned fingerprint.
+            CertificateTrustStore.Forget(host, GateServerPort);
 
             Log("Сброс завершен: сервер очищен от компонентов Gate.");
         }, ct);

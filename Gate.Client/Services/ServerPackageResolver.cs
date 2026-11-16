@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,9 @@ namespace Gate.Client.Services;
 
 public static class ServerPackageResolver
 {
+    /// <summary>Environment variable with an explicit path to a published Gate.Server binary.</summary>
+    public const string ServerBinaryEnvVar = "GATE_SERVER_BINARY";
+
     public static string ResolveBinaryPath(string? customPath = null)
     {
         if (!string.IsNullOrWhiteSpace(customPath) && File.Exists(customPath))
@@ -15,23 +19,25 @@ public static class ServerPackageResolver
             return Path.GetFullPath(customPath);
         }
 
-        var candidates = new[]
+        string? fromEnv = Environment.GetEnvironmentVariable(ServerBinaryEnvVar);
+        if (!string.IsNullOrWhiteSpace(fromEnv) && File.Exists(fromEnv))
+        {
+            return Path.GetFullPath(fromEnv);
+        }
+
+        var candidates = new List<string?>
         {
             Path.Combine(AppContext.BaseDirectory, "server-bundle", "Gate.Server"),
             Path.Combine(Directory.GetCurrentDirectory(), "server-bundle", "Gate.Server"),
             Path.Combine(Directory.GetCurrentDirectory(), "Gate.Client", "server-bundle", "Gate.Server"),
 
             Path.Combine(Directory.GetCurrentDirectory(), "Gate.Server", "bin", "Release", "net8.0", "linux-x64", "publish", "Gate.Server"),
-            "/home/pilldev/CLionProjects/Gate/Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server",
-            "/home/pilldev/RiderProjects/Gate/Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server",
-
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server")),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../Gate.Server/bin/Release/net8.0/linux-x64/publish/Gate.Server")),
+            RepoLocator.InRepo("Gate.Server", "bin", "Release", "net8.0", "linux-x64", "publish", "Gate.Server"),
         };
 
         foreach (var c in candidates)
         {
-            if (File.Exists(c))
+            if (!string.IsNullOrEmpty(c) && File.Exists(c))
             {
                 return c;
             }
@@ -42,17 +48,14 @@ public static class ServerPackageResolver
 
     public static async Task<(bool Success, string BinaryPath, string Output)> AutoBuildServerBinaryAsync()
     {
-        var projectCandidates = new[]
+        var projectCandidates = new List<string?>
         {
             Path.Combine(Directory.GetCurrentDirectory(), "Gate.Server", "Gate.Server.csproj"),
             Path.Combine(Directory.GetCurrentDirectory(), "..", "Gate.Server", "Gate.Server.csproj"),
-            "/home/pilldev/CLionProjects/Gate/Gate.Server/Gate.Server.csproj",
-            "/home/pilldev/RiderProjects/Gate/Gate.Server/Gate.Server.csproj",
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Gate.Server/Gate.Server.csproj")),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../Gate.Server/Gate.Server.csproj")),
+            RepoLocator.InRepo("Gate.Server", "Gate.Server.csproj"),
         };
 
-        string? projectPath = projectCandidates.FirstOrDefault(File.Exists);
+        string? projectPath = projectCandidates.FirstOrDefault(p => !string.IsNullOrEmpty(p) && File.Exists(p));
         if (projectPath == null)
         {
             return (false, string.Empty, "Исходный проект Gate.Server.csproj не найден для сборки.");
